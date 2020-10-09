@@ -20,10 +20,6 @@ import org.apache.commons.lang3.ArrayUtils;
  *@version 0.1 (internal)
  *
  *
- *
- * TODO: instead of throwing a timeout exception, create a timeout listener for the device
-*    Remove apache commons library, replace with own functions
- *    Git initial commit
  */
 public class Device
 {
