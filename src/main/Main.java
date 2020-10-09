@@ -67,8 +67,6 @@ public class Main
         //Delay(1);
         //Delay(1);
         device.Disconnect ();
-        //TODO: clear and disconnect are only working with a delay...
-
 
 
 
@@ -142,7 +140,7 @@ public class Main
         //System.out.println (  device.ReceiveUnsignedByte ());
 
         // -------------------------------------------TESTS -------------------------------------------
-        //TODO: convert to unit tests
+        //TODO: create separate project/ package for testing slave device implementations
        // PrintSerialRead (port);
 
 
