@@ -2,6 +2,8 @@ package main;
 
 import com.fazecast.jSerialComm.*;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.util.Scanner;
 import java.util.concurrent.TimeoutException;
 
@@ -12,10 +14,39 @@ import ALUP.LED;
 public class Main
 {
 
+    /**
+     *  Command line arguments:
+     *  -a  |  --autoselect     automatically select the port if only one is avaliable
+     *
+     */
     public static void main(String[] args)
     {
-	    // write your code here
-        SerialPort port = SelectPort();
+
+
+        //set the serial port at which the slave device is connected to
+        String serialPortName = "COM5";
+        SerialPort port = SerialPort.getCommPort (serialPortName);
+
+        //create a new device
+        Device myDevice = new Device(port);
+
+        //try to connect to the device
+        myDevice.SimpleConnect(115200);
+
+        //create LED data which should be sent
+        LED[] leds = new LED[] { new LED(255, 0, 0), new LED(0, 255, 0), new LED(0, 0, 255)};
+
+        //Send LED data
+        myDevice.SimpleSend(leds);
+
+        //disconnect the device
+        myDevice.Disconnect();
+
+
+/*
+
+        // write your code here
+        SerialPort port = SelectPort((ArrayUtils.contains (args , "-a") || ArrayUtils.contains (args, "--autoselect")));
 
         if(port == null)
         {
@@ -69,7 +100,7 @@ public class Main
         device.Disconnect ();
 
 
-
+*/
  /*       for(int i = 0; i < 1000; i ++)
         {
             //LED[] leds = new LED[] {new LED ( 255,0,0), new LED ( 0,255,0), new LED ( 0,0,255)};
@@ -197,9 +228,10 @@ public class Main
 
     /**
      * function letting the user select a serial port via stdin
+     * @param autoSelect true, if the device should be austomatically selected if only one is found, else false
      * @return the selected Serial Port, or null if no Port was selected
      */
-    private static SerialPort SelectPort()
+    private static SerialPort SelectPort(boolean autoSelect)
     {
         //get all serial devices connected to the system
         System.out.println("Searching for serial devices...");
