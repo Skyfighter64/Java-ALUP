@@ -85,14 +85,11 @@ This implementation does not need to be configured before being used.
 ### Subprograms
 
 
-#### Specifications
-
-
 #### Implementation specific subprograms
 
 A list of subprograms which need to be added to the slave device for this implementation to fully work:
 
-* This implementation does not need any additional subprograms being added to the master device in order to work
+* This implementation does not need any additional subprograms being added to the slave device in order to work
 
 
 #### Adding your own subprograms
