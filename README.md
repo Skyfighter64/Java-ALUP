@@ -159,8 +159,10 @@ If you want to contribute to this project, please see CONTRIBUTING.md (TODO: add
 ## Credits
 
 Libraries used:
-[jSerialComm]
-[Apache Commons Lang] (https://commons.apache.org/proper/commons-lang/)
+
+* [jSerialComm]
+
+* [Apache Commons Lang](https://commons.apache.org/proper/commons-lang/ "Apache Webpage")
 
 
 ## License
