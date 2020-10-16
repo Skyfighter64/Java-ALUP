@@ -420,7 +420,9 @@ public class Device
      */
     public void SimpleSend(LED[] leds, int offset)
     {
-
+        setLeds (leds);
+        setOffset (offset);
+        SimpleSend ( );
     }
 
 
