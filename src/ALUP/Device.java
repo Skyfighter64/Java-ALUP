@@ -12,16 +12,19 @@ import java.util.concurrent.TimeoutException;
  *
  *  When extending/implementing this class:
  *  Implement a "connect(...)" function with any arguments needed.
- *  This function  should establish the connection and then call super.connect() to establish the protocol connection.
+ *  This function  should establish the connection and then call
+ *  super.connect() to establish the protocol connection.
  *
  *  For an example, see SerialDevice.java
  */
 public abstract class Device
 {
-    //the configuration object for this device; null until a connection was established successfully
+    //the configuration object for this device; null until a connection was
+    // established successfully
     DeviceConfiguration configuration;
 
-    //the ping of the device for sending of the last frame in nanoseconds or 0 if no frame was sent yet
+    //the ping of the device for sending of the last frame in nanoseconds or
+    // 0 if no frame was sent yet
     long ping;
 
     //the current frame to be sent next
@@ -32,7 +35,8 @@ public abstract class Device
 
     /**
      * the current connection state of this device
-     * Note: do not change this value when implementing the abstract functions of this class; This is already taken care of
+     * Note: do not change this value when implementing the abstract
+     * functions of this class; This is already taken care of
      */
      CONNECTION_STATE connectionState;
 
@@ -47,10 +51,12 @@ public abstract class Device
     }
 
     /**
-     * function which should receive the given number of bytes and store them into the given buffer over the device connection
+     * function which should receive the given number of bytes and store
+     * them into the given buffer over the device connection
      * <br/>
      * This function may block until the specified number of bytes is read
-     * @param buffer the buffer to store the received data in; has to have a size of bytesToRead
+     * @param buffer the buffer to store the received data in; has to have a
+     *               size of bytesToRead
      * @param bytesToRead the number of bytes to read
      */
     protected abstract void readBytes(byte[] buffer, int bytesToRead );
@@ -62,7 +68,8 @@ public abstract class Device
     protected abstract void writeBytes(byte[] buffer );
 
     /**
-     * function which should return the number of bytes which are currently available to be read
+     * function which should return the number of bytes which are currently
+     * available to be read
      * @return the number of bytes which is currently available to be read
      */
     protected abstract int bytesAvailable();
@@ -84,11 +91,15 @@ public abstract class Device
     /**
      *  function establishing a protocol connection according to the ALUP v.0.1
      *  <br/>
-     *  This function has to be called inside the connect(...)  function of the implementing class, after establishing all other connections.
-     @throws TimeoutException the connection could not be established because the serial device did not send a connection request within 10 seconds
-      * @throws  IncompatibleVersionException The protocol Version of the SerialDevice and the version at Constants.VERSION
+     *  This function has to be called inside the connect(...)  function of the
+     *  implementing class, after establishing all other connections.
+     @throws TimeoutException the connection could not be established
+     because the serial device did not send a connection request within 10 seconds
+      * @throws  IncompatibleVersionException The protocol Version of the
+     * SerialDevice and the version at Constants.VERSION
      * do not match and are therefore incompatible
-     * @throws IllegalArgumentException The configuration received from the device or parts of it were invalid. Therefore the
+     * @throws IllegalArgumentException The configuration received from
+     * the device or parts of it were invalid. Therefore the
      *                           connection attempt was stopped.
      */
     protected void connect() throws TimeoutException, IncompatibleVersionException, IllegalArgumentException
@@ -110,7 +121,8 @@ public abstract class Device
 
 
     /**
-     * function disconnecting this device so it can't be used for led data transmission any longer
+     * function disconnecting this device so it can't be used for led data
+     * transmission any longer
      */
     public void disconnect()
     {
@@ -125,7 +137,8 @@ public abstract class Device
 
     /**
      * function invalidating the connection to the device when it times out
-     * Note: if you want to disconnect from the device, use Disconnect() instead as it also tells the device to disconnect
+     * Note: if you want to disconnect from the device, use Disconnect()
+     * instead as it also tells the device to disconnect
      */
     private void invalidateConnection()
     {
@@ -139,9 +152,12 @@ public abstract class Device
 
 
     /**
-     * function comparing the given protocolVersion to the one specified in Constants.VERSION
+     * function comparing the given protocolVersion to the one specified in
+     * Constants.VERSION
      * @param protocolVersion the protocol version to compare
-     * @throws IncompatibleVersionException The given protocol Version and the version at Constants.VERSION do not match and are therefore incompatible
+     * @throws IncompatibleVersionException The given protocol Version
+     * and the version at Constants.VERSION do not match and are therefore
+     * incompatible
      */
     private void checkProtocolVersion(String protocolVersion) throws IncompatibleVersionException
     {
@@ -157,7 +173,8 @@ public abstract class Device
     //region LED clamping
 
     /**
-     * function clamping the given LED array inside the range of the LED strip connected to the device returning it
+     * function clamping the given LED array inside the range of the LED strip
+     * connected to the device returning it
      * @param leds the LEDs to be trimmed and set
      * @param offset the offset for which the LEDs should be trimmed
      * @return the new offset for the trimmed LEDs
@@ -177,24 +194,29 @@ public abstract class Device
 
 
     /**
-     * function clamping the offset if it exceeds the maximum number of LEDs or is smaller than 0.
+     * function clamping the offset if it exceeds the maximum number of
+     * LEDs or is smaller than 0.
      * @param offset the offset to be trimmed
      * @param maxLeds the maximum number of LEDs
      * @return the clamped offset
      */
     static int clampOffset(int offset, int maxLeds)
     {
-        //clamp the given offset between 0 and the number of LEDs connected to the device
+        //clamp the given offset between 0 and the number of LEDs connected
+        // to the device
         return Math.max (0, Math.min (maxLeds, offset));
     }
 
 
 
     /**
-     *  function trimming the start of given LED array for the given offset if it exceeds the numOfLeds of this device
-     *  Note: when using this function, you need to trim the offset separately using TrimOffset()
+     *  function trimming the start of given LED array for the given offset if
+     *  it exceeds the numOfLeds of this device
+     *  Note: when using this function, you need to trim the offset separately
+     *  using TrimOffset()
      * @param leds the LED array which should be trimmed; has to be non-null
-     * @param offset the offset for which the LED array should be trimmed; can be negative
+     * @param offset the offset for which the LED array should be trimmed;
+     *               can be negative
      * @return the trimmed LED array
      */
     private LED[] trimStart(LED[] leds, int offset)
@@ -223,10 +245,14 @@ public abstract class Device
 
 
     /**
-     *  function trimming the end of given LED array for the given offset if it exceeds the numOfLeds of this device
-     *  Note: when using this function, you need to trim the offset separately using TrimOffset()
+     *  function trimming the end of given LED array for the given offset if it
+     *  exceeds the numOfLeds of this device
+     *  <br/>
+     *  Note: when using this function, you need to trim the offset separately
+     *  using TrimOffset()
      * @param leds the LED array which should be trimmed; has to be non-null
-     * @param offset the offset for which the LED array should be trimmed; can be negative
+     * @param offset the offset for which the LED array should be trimmed;
+     *              can be negative
      * @return the trimmed LED array
      */
     private LED[] trimEnd(LED[] leds, int offset)
@@ -251,15 +277,19 @@ public abstract class Device
 
 
     /**
-     * function fitting the given length combined with the given offset into the range of 0 to maxLength
+     * function fitting the given length combined with the given offset into
+     * the range of 0 to maxLength
      * @param maxLength the maxLength which should not be exceeded
      * @param length the current length of the array
      * @param offset the offset of the array
-     * @return the new length of the array; guaranteed to be  <= length and  >= 0, depending on if the given length exceeds one end of the range from 0 to maxLength
+     * @return the new length of the array; guaranteed to be  <= length and
+     * >= 0, depending on if the given length exceeds one end of the range
+     * from 0 to maxLength
      */
     static int fitArrayLength(int maxLength, int length, int offset)
     {
-        //check if the given length combined with the offset is exceeding the max length
+        //check if the given length combined with the offset is exceeding the
+        // max length
         if( (length  + offset) > maxLength)
         {
             //cut the length to fit within the range
@@ -284,9 +314,13 @@ public abstract class Device
     //region sender functions
 
     /**
-     * unction sending the currently saved frame over the Serial connection of this Device and waiting for "Frame Acknowledgement" or a "Frame Error" response
-     * In comparison to Send(), this function catches TimeoutExceptions by printing the StackTrace to the terminal.
-     * When the Frame is null, sending will get skipped without an error message or warning
+     * unction sending the currently saved frame over the Serial connection
+     * of this Device and waiting for "Frame Acknowledgement" or a "Frame Error"
+     * response
+     * In comparison to Send(), this function catches TimeoutExceptions by
+     * printing the StackTrace to the terminal.
+     * When the Frame is null, sending will get skipped without an error
+     * message or warning
      */
     public void simpleSend()
     {
@@ -302,10 +336,16 @@ public abstract class Device
     }
 
     /**
-     * function sending the given LED array over the Serial connection of this Device and waiting for "Frame Acknowledgement" or a "Frame Error" response
-     * In comparison to Send(), this function catches TimeoutExceptions by printing the StackTrace to the terminal.
-     * When the Frame is null, sending will get skipped without an error message or warning
-     * @param leds the led array to be sent; will be cut to the right size if it does not fit onto the actual LED strip
+     * function sending the given LED array over the Serial connection of this
+     * Device and waiting for "Frame Acknowledgement" or a "Frame Error" response
+     * <br/>
+     * In comparison to Send(), this function catches TimeoutExceptions
+     * by printing the StackTrace to the terminal.
+     *  <br/>
+     * When the Frame is null, sending will get skipped without an error
+     * message or warning
+     * @param leds the led array to be sent; will be cut to the right size if it
+     *             does not fit onto the actual LED strip
      */
     public void simpleSend(LED[] leds)
     {
@@ -314,10 +354,18 @@ public abstract class Device
     }
 
     /**
-     * function applying the given LED array and offset to the current frame and sending the current frame over the Serial connection of this Device and waiting for "Frame Acknowledgement" or a "Frame Error" response, overloading the Send() function
-     *  In comparison to Send(), this function catches TimeoutExceptions by printing the StackTrace to the terminal.
-     * When the Frame is null, sending will get skipped without an error message or warning
-     * @param leds the LED array to be sent; will be cut to the right size if it does not fit onto the actual LED strip
+     * function applying the given LED array and offset to the current frame
+     * and sending the current frame over the Serial connection of this Device
+     * and waiting for "Frame Acknowledgement" or a "Frame Error" response,
+     * overloading the Send() function
+     * <br/>
+     *  In comparison to Send(), this function catches TimeoutExceptions by
+     *  printing the StackTrace to the terminal.
+     *  <br/>
+     * When the Frame is null, sending will get skipped without an error
+     * message or warning
+     * @param leds the LED array to be sent; will be cut to the right size if it
+     *             does not fit onto the actual LED strip
      * @param offset the offset for the given LED array when applying;
      */
     public void simpleSend(LED[] leds, int offset)
@@ -329,11 +377,18 @@ public abstract class Device
 
 
     /**
-     * function sending the currently saved frame over the Serial connection of this Device and waiting for "Frame Acknowledgement" or a "Frame Error" response
-     *When the Frame is null, sending will get skipped without an error message or warning
-     * @throws ConnectionException The device is not connected; Connect first by establishing a serial connection and using Connect()
-     * @throws TimeoutException no Frame Acknowledgement or frame error byte received within the timeOut; the device may be disconnected
-     * @throws  FrameErrorException a Frame Error byte was received, indicating that the previously sent frame could not be applied by the device
+     * function sending the currently saved frame over the Serial connection
+     * of this Device and waiting for "Frame Acknowledgement" or a "Frame Error"
+     * response
+     * <br/>
+     *When the Frame is null, sending will get skipped without an error message
+     *  or warning
+     * @throws ConnectionException The device is not connected; Connect
+     * first by establishing a serial connection and using Connect()
+     * @throws TimeoutException no Frame Acknowledgement or frame
+     * error byte received within the timeOut; the device may be disconnected
+     * @throws  FrameErrorException a Frame Error byte was received,
+     * indicating that the previously sent frame could not be applied by the device
      *
      */
     public void send() throws TimeoutException, FrameErrorException
@@ -352,12 +407,14 @@ public abstract class Device
         }
 
         //Clamp the LED array and the offset
-        /* this is done in order to make it possible to use negative offsets or offset values which would otherwise be out of range */
+        /* this is done in order to make it possible to use negative offsets or
+        offset values which would otherwise be out of range */
 
         //clamp the LED array so it allways fits to the actual LED strip
         setLeds (clampLeds (getLeds (), getOffset ()));
 
-        //clamp the offset value according to the amount of connected LEDs, so it is within the range of the connected LEDs
+        //clamp the offset value according to the amount of connected LEDs,
+        // so it is within the range of the connected LEDs
         setOffset (clampOffset (getOffset(), getConfiguration ().getNumOfLeds ()));
 
 
@@ -394,12 +451,20 @@ public abstract class Device
 
 
     /**
-     * function applying the given LED array to the current frame and sending the current frame over the Serial connection of this Device and waiting for "Frame Acknowledgement" or a "Frame Error" response, overloading the Send() function
+     * function applying the given LED array to the current frame and sending
+     * the current frame over the Serial connection of this Device and waiting
+     * for "Frame Acknowledgement" or a "Frame Error" response, overloading
+     * the Send() function.
+     * <br/>
      *When the Frame is null, sending will get skipped without an error message or warning
-     * @param leds the led array to be sent; will be cut to the right size if it does not fit onto the actual LED strip
-     * @throws ConnectionException The device is not connected; Connect first by establishing a serial connection and using Connect()
-     * @throws TimeoutException no Frame Acknowledgement or frame error byte received within the timeOut; the device may be disconnected
-     * @throws  FrameErrorException a Frame Error byte was received, indicating that the previously sent frame could not be applied by the device
+     * @param leds the led array to be sent; will be cut to the right size if it
+     *             does not fit onto the actual LED strip
+     * @throws ConnectionException The device is not connected; Connect
+     * first by establishing a serial connection and using Connect()
+     * @throws TimeoutException no Frame Acknowledgement or frame error
+     * byte received within the timeOut; the device may be disconnected
+     * @throws  FrameErrorException a Frame Error byte was received,
+     * indicating that the previously sent frame could not be applied by the device
      */
     public void send(LED[] leds) throws TimeoutException, FrameErrorException
     {
@@ -410,14 +475,23 @@ public abstract class Device
 
 
     /**
-     * function applying the given LED array and offset to the current frame and sending the current frame over the Serial connection of this Device and waiting for "Frame Acknowledgement" or a "Frame Error" response, overloading the Send() function
+     * function applying the given LED array and offset to the current frame
+     * and sending the current frame over the Serial connection of this Device
+     * and waiting for "Frame Acknowledgement" or a "Frame Error" response,
+     * overloading the Send() function
+     * <br/>
      *When the Frame is null, sending will get skipped without an error message or warning
-     * @param leds the LED array to be sent; will be cut to the right size if it does not fit onto the actual LED strip
+     * @param leds the LED array to be sent; will be cut to the right size if it
+     *            does not fit onto the actual LED strip
      * @param offset the offset for the given LED array when applying;
-     * @throws ConnectionException The device is not connected; Connect first by establishing a serial connection and using Connect()
-     * @throws TimeoutException no Frame Acknowledgement or frame error byte received within the timeOut; the device may be disconnected
-     * @throws  FrameErrorException a Frame Error byte was received, indicating that the previously sent frame could not be applied by the device
-     * @throws OutOfRangeException the given offset value is invalid according to the ALUP v. 0.1
+     * @throws ConnectionException The device is not connected; Connect
+     * first by establishing a serial connection and using Connect()
+     * @throws TimeoutException no Frame Acknowledgement or frame error
+     * byte received within the timeOut; the device may be disconnected
+     * @throws  FrameErrorException a Frame Error byte was received,
+     * indicating that the previously sent frame could not be applied by the device
+     * @throws OutOfRangeException the given offset value is invalid
+     * according to the ALUP v. 0.1
      */
     public void send(LED[] leds, int offset) throws TimeoutException, FrameErrorException
     {
@@ -428,14 +502,18 @@ public abstract class Device
 
 
     /**
-     * function serializing the given frame according to the ALUP v. 0.1 frame specifications and sending it over the serial connection
-     * Note: This function is for raw frame sending only. Please use Send() instead as it also checks for acknowledgements and is more save to use
+     * function serializing the given frame according to the ALUP v. 0.1 frame
+     * specifications and sending it over the serial connection
+     * <br/>
+     * Note: This function is for raw frame sending only. Please use Send()
+     * instead as it also checks for acknowledgements and is more save to use
      * @param frame the frame to be sent; has to be non-null
      */
     private void sendFrame(Frame frame)
     {
         //serialize the content of the header and frame body to unsigned byte values
-        //Note: an array type of short is needed because Java does not support unsigned values.
+        //Note: an array type of short is needed because Java does not support
+        // unsigned values.
         short[] header = frame.getHeader ().serialize ();
         short[] body = LED.serializeArray (frame.getLeds ());
 
@@ -453,10 +531,16 @@ public abstract class Device
 
 
     /**
-     * function sending the first byte of the given short value over the serial connection of this device
+     * function sending the first byte of the given short value over the serial
+     * connection of this device
      * @param value a number ranging from 0-255
-     *  Note: Only the first byte of the given short number will be sent over the serial connection.
-     *              This has to be done because Java has no support for unsigned values.
+     *              <br/>
+     *  Note: Only the first byte of the given short number will be sent over
+     *              the serial connection.
+     *              <br/>
+     *              This has to be done because Java has no support for unsigned
+     *              values.
+     *              <br/>
      *              Therefore the actual value from 0-255 given to this function will be sent
      */
     private void sendUnsignedByte(short value)
@@ -471,11 +555,18 @@ public abstract class Device
 
 
     /**
-     * function sending the first byte of the given short value over the serial connection of this device
+     * function sending the first byte of the given short value over the serial
+     * connection of this device
      * @param values an array of numbers ranging from 0-255
-     *  Note: Only the first byte of each given short number will be sent over the serial connection.
-     *              This has to be done because Java has no support for unsigned values.
-     *              Therefore the actual usnigned byte value of each short from 0-255 given to this function will be sent
+     *               <br/>
+     *  Note: Only the first byte of each given short number will be sent over
+     *              the serial connection.
+     *               <br/>
+     *              This has to be done because Java has no support for unsigned
+     *               values.
+     *               <br/>
+     *              Therefore the actual usnigned byte value of each short from 0-255
+     *              given to this function will be sent
      */
     private void sendUnsignedBytes(short[] values)
     {
@@ -511,7 +602,8 @@ public abstract class Device
 
     /**
      * function sending a connection abort signal to the serial device
-     * indicating that the configuration caused an error and the connection attempt will be stopped
+     * indicating that the configuration caused an error and the connection
+     * attempt will be stopped
      */
     private void sendConfigurationError()
     {
@@ -538,13 +630,20 @@ public abstract class Device
 
 
     /**
-     * function receiving the configuration of the device over the serial connection and applying it to
-     * Note: This function blocks until the configuration was received successfully
-     *  this object. Retrieve it using getConfiguration()
-     *  @throws TimeoutException the configuration could not be received because the serial device did not send a CONFIGURATION_START_BYTE within 10 seconds
-     *  @throws IncompatibleVersionException The protocol Version of the SerialDevice and the version at Constants.VERSION
+     * function receiving the configuration of the device over the serial
+     * connection and applying it to this device
+     * <br/>
+     * Note: This function blocks until the configuration was received successfully.
+     * <br/>
+     *  Retrieve it using getConfiguration()
+     *  @throws TimeoutException the configuration could not be received
+     *  because the serial device did not send a CONFIGURATION_START_BYTE
+     *  within 10 seconds
+     *  @throws IncompatibleVersionException The protocol Version of the
+     *  SerialDevice and the version at Constants.VERSION
      *                      do not match and are therefore incompatible
-     * @throws IllegalArgumentException The configuration received from the device or parts of it were invalid. Therefore the
+     * @throws IllegalArgumentException The configuration received from
+     * the device or parts of it were invalid. Therefore the
      *                      connection attempt was stopped
      */
     private void receiveConfiguration ( ) throws IncompatibleVersionException, TimeoutException, IllegalArgumentException
@@ -583,7 +682,8 @@ public abstract class Device
         //send a configuration acknowledgement
         sendConfigurationAcknowledgement();
 
-        //wait for a configuration acknowledgement from the slave device to finish the configuration process
+        //wait for a configuration acknowledgement from the slave device to
+        // finish the configuration process
         if(!waitForByte (Constants.CONFIGURATION_ACKNOWLEDGEMENT_BYTE, RECEIVER_TIMEOUT))
         {
             //no configuration Acknowledgement received within the timeOut
@@ -595,8 +695,11 @@ public abstract class Device
 
 
     /**
-     * receive a String over the serial connection until a null terminator ('\0') is received
-     * Note: This function blocks until a null byte is received and a string is returned
+     * receive a String over the serial connection until a null terminator ('\0')
+     * is received
+     * <br/>
+     * Note: This function blocks until a null byte is received and a string is
+     * returned
      * @return the string which was read from the serial Connection
      */
     private String receiveString ( )
@@ -656,9 +759,12 @@ public abstract class Device
      * function receiving one unsigned byte over the serial connection
      * Note: This function blocks until a byte is received and returned
      *
-     * @return the byte received over the serial connection represented as a short, ranging from 0 - 255
-     * Note: a return type of short has to be used as java does not support unsigned type variables.
-     * By using a short, it's possible for this function to return an unsigned byte value anyways
+     * @return the byte received over the serial connection represented as a
+     * short, ranging from 0 - 255
+     * Note: a return type of short has to be used as java does not support
+     * unsigned type variables.
+     * By using a short, it's possible for this function to return an unsigned
+     * byte value anyways
      */
     private short receiveUnsignedByte()
     {
@@ -679,11 +785,17 @@ public abstract class Device
     //region waiter functions
 
     /**
-     * function waiting, until the specified byte was received via the serial connection or the timeout limit was reached
-     * Note: This function blocks until the specified byte is received or the specified timeout  was reached
+     * function waiting, until the specified byte was received via the serial
+     * connection or the timeout limit was reached
+     * <br/>
+     * Note: This function blocks until the specified byte is received or the
+     * specified timeout  was reached
+     * <br/>
      * @param b the byte which should be received
-     * @param timeOut the time limit for this function to receive the specified byte in milliseconds; has to be > 0
-     * @return true, if the specified byte was received, false if the timeout was exceeded or the function was interrupted
+     * @param timeOut the time limit for this function to receive the specified
+     *               byte in milliseconds; has to be > 0
+     * @return true, if the specified byte was received, false if the timeout
+     * was exceeded or the function was interrupted
      */
     private boolean waitForByte(Byte b, int timeOut)
     {
@@ -692,11 +804,17 @@ public abstract class Device
 
 
     /**
-     * function waiting, until one of the specified bytes was received via the serial connection or the timeout limit was reached
-     * Note: This function blocks until one of the specified byte is received or the specified timeout  was reached
-     * @param timeOut the time limit for this function to receive the specified byte in milliseconds; has to be > 0
+     * function waiting, until one of the specified bytes was received via the
+     * serial connection or the timeout limit was reached
+     * <br/>
+     * Note: This function blocks until one of the specified byte is received or
+     * the specified timeout  was reached
+     * <br/>
+     * @param timeOut the time limit for this function to receive the specified
+     *                byte in milliseconds; has to be > 0
      * @param bytes the bytes to wait for
-     * @return the index of the received byte, or -1 if the timeOut was exceeded or the function was interrupted
+     * @return the index of the received byte, or -1 if the timeOut was exceeded
+     * or the function was interrupted
      */
     private  int waitForOneOf( int timeOut, byte... bytes)
     {
@@ -738,8 +856,10 @@ public abstract class Device
     }
 
     /**
-     * function waiting for a connection request, returning as soon as a connection request was received
-     * Note: This function blocks until a byte is received or a timeout of 10 seconds was reached
+     * function waiting for a connection request, returning as soon as a
+     * connection request was received
+     * Note: This function blocks until a byte is received or a timeout of 10
+     * seconds was reached
      * @return true, if the byte was received, else false
      */
     private boolean waitForConnectionRequest ( )
@@ -769,7 +889,8 @@ public abstract class Device
 
     /**
      * function setting all LEDs of the device to 0
-     * In comparison to Clear(), this function catches TimeoutExceptions by printing the StackTrace to the terminal.
+     * In comparison to Clear(), this function catches TimeoutExceptions by
+     * printing the StackTrace to the terminal.
      */
     public void simpleClear()
     {
@@ -785,7 +906,8 @@ public abstract class Device
 
 
     /**
-     * function setting the command of the current frame to clear; when used with a non-empty frame, this will set all unchanged LEDs to black
+     * function setting the command of the current frame to clear; when
+     * used with a non-empty frame, this will set all unchanged LEDs to black
      * @param state true, if the clear command should be set, else false
      */
     public void setClear(boolean state)
@@ -807,7 +929,8 @@ public abstract class Device
     //region getter
 
     /**
-     * function returning the currently for this device stored LEDs or, if no LEDs are stored, a new LED array with all possible LEDs set to 0
+     * function returning the currently for this device stored LEDs or, if no
+     * LEDs are stored, a new LED array with all possible LEDs set to 0
      * @return an array of LEDs; guaranteed to be non-null
      */
     public LED[] getLeds()
@@ -822,7 +945,8 @@ public abstract class Device
         //check if the currently stored LED array is null or empty
         if(frame.getLeds () == null || frame.getLeds ().length == 0)
         {
-            //the currently stored LED array is null or empty; initialize a new array with the maximum size
+            //the currently stored LED array is null or empty; initialize a new array
+            // with the maximum size
             LED[] leds = new LED[configuration.getNumOfLeds ()];
             for(int i = 0; i < leds.length; i++)
             {
@@ -837,7 +961,8 @@ public abstract class Device
 
     /**
      * getter for the ping
-     * @return the ping to the device from the last frame sent until its answer in nanoseconds
+     * @return the ping to the device from the last frame sent until its answer
+     * in nanoseconds
      */
     public long getPing()
     {
@@ -848,7 +973,8 @@ public abstract class Device
 
     /**
      * getter for the ping in milliseconds
-     * @return the ping to the device from the last frame sent until its answer in milliseconds
+     * @return the ping to the device from the last frame sent until its answer
+     * in milliseconds
      */
     public long getPingMS()
     {
@@ -862,7 +988,8 @@ public abstract class Device
 
 
     /**
-     * function indicating if this device is fully connected and ready for data transmission
+     * function indicating if this device is fully connected and ready for data
+     * transmission
      * @return true, if the device is fully connected, else false
      */
     public boolean isConnected()
@@ -895,7 +1022,8 @@ public abstract class Device
 
     //region setter
     /**
-     * function setting the subcommand for a subprogram which shuld be executed on the receiving device
+     * function setting the subcommand for a subprogram which should be
+     * executed on the receiving device
      * @param id the ID of the subprogram to execute; has to be within a range of 0-247
      * @throws IllegalArgumentException the given ID is not within a range of 0-247
      */
@@ -913,7 +1041,8 @@ public abstract class Device
 
 
     /**
-     * function setting the led values of this frame; automatically cuts the array to the size of the led strip if it is too large
+     * function setting the led values of this frame; automatically cuts the
+     * array to the size of the led strip if it is too large
      * @param leds the led values to be set
      */
     public void setLeds(LED[] leds)
@@ -928,13 +1057,13 @@ public abstract class Device
 
 
 
-
-
-
     /**
      * function setting the offset for the current frame
-     * @param offset the value to set the body offset to; has to be a positive value; the offset + leds.length has to be smaller than the number of leds connected to the device
-     *  @throws OutOfRangeException the offset value of the frame which should be sent was invalid
+     * @param offset the value to set the body offset to; has to be a positive
+     *              value; the offset + leds.length has to be smaller than the number
+     *              of leds connected to the device
+     *  @throws OutOfRangeException the offset value of the frame which
+     *  should be sent was invalid
      */
     public void setOffset(int offset)
     {
@@ -944,14 +1073,6 @@ public abstract class Device
             frame = new Frame ( );
         }
 
-        //validate the frame offset specifically for this device
-     /*
-        this check is not needed anymore as the offset gets clamped in the send function
-        if(!ValidateFrameOffset(offset))
-        {
-            //the frame offset is not valid
-            throw new OutOfRangeException ( "The offset of the frame which should be sent with a value of " + offset + " is out of range");
-        }*/
         frame.setOffset (offset);
     }
     //endregion
