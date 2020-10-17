@@ -154,6 +154,6 @@ public class SerialDevice extends Device
     @Override
     public void closeConnection ( )
     {
-
+            serialPort.closePort ();
     }
 }
