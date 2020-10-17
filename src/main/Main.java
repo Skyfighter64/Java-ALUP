@@ -4,6 +4,7 @@ import com.fazecast.jSerialComm.*;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import java.io.IOException;
 import java.util.Scanner;
 import java.util.concurrent.TimeoutException;
 
@@ -29,10 +30,10 @@ public class Main
         SerialPort port = SerialPort.getCommPort (serialPortName);
 
         //create a new device
-        SerialDevice myDevice = new SerialDevice (port);
+        SerialDevice myDevice = new SerialDevice (port, 115200);
 
         //try to connect to the device
-        myDevice.simpleConnect(115200);
+        myDevice.simpleConnect();
 
         //create LED data which should be sent
         LED[] leds = new LED[] { new LED(255, 0, 0), new LED(0, 255, 0), new LED(0, 0, 255)};
@@ -219,6 +220,11 @@ public class Main
         catch (TimeoutException e)
         {
             System.out.println ( "Device timed out");
+            e.printStackTrace ( );
+        }
+        catch (IOException e)
+        {
+            System.out.println ( "IO error occured");
             e.printStackTrace ( );
         }
 

@@ -49,13 +49,17 @@ public class SerialDevice extends Device
     public SerialPort serialPort;
 
     /**
-     * constructor creating a new Device using the given serialPort
+     * constructor creating a new Device using the given serialPort and baud rate
      * @param serialPort a serial port, does not have to be open
+     * @param baud  the baud rate used for serial communication between
+     *             the devices; has to be a valid baud rate supported by both
+     *              devices and the same as set on the slave device
      */
-    public SerialDevice(SerialPort serialPort)
+    public SerialDevice(SerialPort serialPort, int baud)
     {
         super();
         this.serialPort = serialPort;
+        this.serialPort.setBaudRate (baud);
     }
 
 
@@ -63,10 +67,6 @@ public class SerialDevice extends Device
      * function connecting this device so it can be used for led data
      * transmission
      * according to the ALUP protocol v. 0.1
-     * @param baud  the baud rate used for serial communication between
-     *             the devices; has to be a valid baud rate supported by both
-     *              devices and the same as set on the slave device
-     *
      * @throws TimeoutException the connection could not be established
      * because the serial device did not send a connection request within 10
      * seconds
@@ -77,38 +77,13 @@ public class SerialDevice extends Device
      * the device or parts of it were invalid. Therefore the
      *                           connection attempt was stopped.
      */
-    public void connect(int baud) throws TimeoutException, IncompatibleVersionException, IllegalArgumentException
+    public void openConnection()
     {
         //establish the serial connection
-        serialPort.setBaudRate (baud);
         serialPort.openPort ();
-
-        //establish the protocol connection
-        super.connect ();
     }
 
-    /**
-     * function connecting this device so it can be used for led data
-     * transmission according to the ALUP protocol v. 0.1
-     * In Comparison to Connect(), this function handles timeOutExceptions
-     * to be easier to use. If you want to handle timeOuts yourself, use Connect()
-     * @param baud  the baud rate used for serial communication between
-     *              the devices; has to be a valid baud rate supported by both
-     *              devices and the same as set on the Arduino
-     */
 
-    public void simpleConnect(int baud)
-    {
-        try
-        {
-            connect (baud);
-        }
-        catch (TimeoutException e)
-        {
-            connectionState = CONNECTION_STATE.DISCONNECTED;
-            e.printStackTrace ( );
-        }
-    }
 
 
     /**
@@ -155,5 +130,17 @@ public class SerialDevice extends Device
     public void closeConnection ( )
     {
             serialPort.closePort ();
+    }
+
+    @Override
+    public String toString ( )
+    {
+        return "SerialDevice{" +
+                "serialPort=" + serialPort +
+                ", configuration=" + configuration +
+                ", ping=" + ping +
+                ", frame=" + frame +
+                ", connectionState=" + connectionState +
+                '}';
     }
 }

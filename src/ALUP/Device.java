@@ -2,6 +2,7 @@ package ALUP;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.concurrent.TimeoutException;
@@ -59,13 +60,13 @@ public abstract class Device
      *               size of bytesToRead
      * @param bytesToRead the number of bytes to read
      */
-    protected abstract void readBytes(byte[] buffer, int bytesToRead );
+    protected abstract void readBytes(byte[] buffer, int bytesToRead ) throws IOException;
 
     /**
      * function which should send the given bytes over the device connection
      * @param buffer an array containing the data which should be sent.
      */
-    protected abstract void writeBytes(byte[] buffer );
+    protected abstract void writeBytes(byte[] buffer ) throws IOException;
 
     /**
      * function which should return the number of bytes which are currently
@@ -74,11 +75,17 @@ public abstract class Device
      */
     protected abstract int bytesAvailable();
 
+    /**
+     * function which should open the connection to the device
+     * @throws IOException an exception thrown by the implementing class
+     * when calling openConnection(); for more info, see the implementing class
+     */
+    protected abstract void openConnection() throws IOException;
 
     /**
      * function which should close the connection to the device
      */
-    public abstract void closeConnection();
+    protected abstract void closeConnection();
 
 
     //default constructor of this class
@@ -101,9 +108,16 @@ public abstract class Device
      * @throws IllegalArgumentException The configuration received from
      * the device or parts of it were invalid. Therefore the
      *                           connection attempt was stopped.
+     * @throws IOException the hardware connection could not be established
+     * because of various reasons. For more, see openConnection() of the
+     * implementing class
+     *
      */
-    protected void connect() throws TimeoutException, IncompatibleVersionException, IllegalArgumentException
+    public void connect() throws TimeoutException, IncompatibleVersionException, IllegalArgumentException, IOException
     {
+        //open the hardware connection to the device
+        openConnection ();
+
         if(!waitForConnectionRequest())
         {
             //no connection request received (timed out);
@@ -116,7 +130,25 @@ public abstract class Device
         connectionState = CONNECTION_STATE.CONNECTED;
     }
 
+    /**
+     * function connecting this device so it can be used for led data
+     * transmission according to the ALUP protocol v. 0.1
+     * In Comparison to Connect(), this function handles timeOutExceptions
+     * to be easier to use. If you want to handle timeOuts yourself, use Connect()
+     */
 
+    public void simpleConnect()
+    {
+        try
+        {
+            connect ();
+        }
+        catch (TimeoutException | IOException e)
+        {
+            connectionState = CONNECTION_STATE.DISCONNECTED;
+            e.printStackTrace ( );
+        }
+    }
 
 
 
@@ -127,7 +159,14 @@ public abstract class Device
     public void disconnect()
     {
         //send a disconnect command to the slave device
-        sendDisconnectFrame ();
+        try
+        {
+            sendDisconnectFrame ();
+        }
+        catch (IOException e)
+        {
+            //disconnect frame could not be sent; assume that the device already disconnected
+        }
         //disconnect on this side of the device
         invalidateConnection ();
         //set the connection state to disconnected
@@ -164,7 +203,14 @@ public abstract class Device
         if(!protocolVersion.equals (Constants.VERSION))
         {
             //tell the device that the configuration could not be applied and throw an error
-            sendConfigurationError ();
+            try
+            {
+                sendConfigurationError ();
+            }
+            catch (IOException e)
+            {
+                //the configuration error could not be sent; assume that the device disconnected itself
+            }
             throw new IncompatibleVersionException("The protocol version of the Device ('" + protocolVersion + "') does not match this version ('" + Constants.VERSION + "')");
         }
     }
@@ -328,7 +374,7 @@ public abstract class Device
         {
             send();
         }
-        catch (TimeoutException e)
+        catch (TimeoutException | IOException e)
         {
             //just print the StackTrace and return
             e.printStackTrace ( );
@@ -389,9 +435,10 @@ public abstract class Device
      * error byte received within the timeOut; the device may be disconnected
      * @throws  FrameErrorException a Frame Error byte was received,
      * indicating that the previously sent frame could not be applied by the device
+     * @throws IOException an IO error occurred while waiting for a response
      *
      */
-    public void send() throws TimeoutException, FrameErrorException
+    public void send() throws TimeoutException, FrameErrorException, IOException
     {
 
         //check if the connection was established before
@@ -465,8 +512,10 @@ public abstract class Device
      * byte received within the timeOut; the device may be disconnected
      * @throws  FrameErrorException a Frame Error byte was received,
      * indicating that the previously sent frame could not be applied by the device
+     * @throws IOException the data could not be sent because an IO error
+     * occurred
      */
-    public void send(LED[] leds) throws TimeoutException, FrameErrorException
+    public void send(LED[] leds) throws TimeoutException, FrameErrorException, IOException
     {
         setLeds (leds);
         send ();
@@ -492,8 +541,10 @@ public abstract class Device
      * indicating that the previously sent frame could not be applied by the device
      * @throws OutOfRangeException the given offset value is invalid
      * according to the ALUP v. 0.1
+     * @throws IOException the data could not be sent because an IO error
+     *  occurred
      */
-    public void send(LED[] leds, int offset) throws TimeoutException, FrameErrorException
+    public void send(LED[] leds, int offset) throws TimeoutException, FrameErrorException, IOException
     {
         setLeds (leds);
         setOffset (offset);
@@ -508,8 +559,9 @@ public abstract class Device
      * Note: This function is for raw frame sending only. Please use Send()
      * instead as it also checks for acknowledgements and is more save to use
      * @param frame the frame to be sent; has to be non-null
+     * @throws IOException an IO error occurred while sending the data
      */
-    private void sendFrame(Frame frame)
+    private void sendFrame(Frame frame) throws IOException
     {
         //serialize the content of the header and frame body to unsigned byte values
         //Note: an array type of short is needed because Java does not support
@@ -534,6 +586,7 @@ public abstract class Device
      * function sending the first byte of the given short value over the serial
      * connection of this device
      * @param value a number ranging from 0-255
+     * @throws IOException an IO error occurred while sending the data
      *              <br/>
      *  Note: Only the first byte of the given short number will be sent over
      *              the serial connection.
@@ -543,7 +596,7 @@ public abstract class Device
      *              <br/>
      *              Therefore the actual value from 0-255 given to this function will be sent
      */
-    private void sendUnsignedByte(short value)
+    private void sendUnsignedByte(short value) throws IOException
     {
         //get the first byte of the short
         byte lowByte = (byte) (value & 0xff);
@@ -558,6 +611,7 @@ public abstract class Device
      * function sending the first byte of the given short value over the serial
      * connection of this device
      * @param values an array of numbers ranging from 0-255
+     * @throws IOException an IO error occurred while sending the data
      *               <br/>
      *  Note: Only the first byte of each given short number will be sent over
      *              the serial connection.
@@ -568,7 +622,7 @@ public abstract class Device
      *              Therefore the actual usnigned byte value of each short from 0-255
      *              given to this function will be sent
      */
-    private void sendUnsignedBytes(short[] values)
+    private void sendUnsignedBytes(short[] values) throws IOException
     {
         //convert the short values to unsigned bytes
         byte[] lowBytes = new byte[values.length];
@@ -585,8 +639,9 @@ public abstract class Device
 
     /**
      * function sending a connection acknowledgement to the serial device
+     * @throws IOException an IO error occurred while sending the data
      */
-    private void sendConnectionAcknowledgement ( )
+    private void sendConnectionAcknowledgement ( ) throws IOException
     {
         writeBytes (new byte[]{Constants.CONNECTION_ACKNOWLEDGEMENT_BYTE});
     }
@@ -594,8 +649,9 @@ public abstract class Device
     /**
      * function sending a configuration acknowledgement to the serial device
      * indicating that the configuration was received and applied correctly
+     * @throws IOException an IO error occurred while sending the data
      */
-    private void sendConfigurationAcknowledgement ( )
+    private void sendConfigurationAcknowledgement ( ) throws IOException
     {
         writeBytes (new byte[]{Constants.CONFIGURATION_ACKNOWLEDGEMENT_BYTE});
     }
@@ -604,8 +660,9 @@ public abstract class Device
      * function sending a connection abort signal to the serial device
      * indicating that the configuration caused an error and the connection
      * attempt will be stopped
+     * @throws IOException an IO error occurred while sending the data
      */
-    private void sendConfigurationError()
+    private void sendConfigurationError() throws IOException
     {
         writeBytes (new byte[]{Constants.CONFIGURATION_ERROR_BYTE});
     }
@@ -613,8 +670,9 @@ public abstract class Device
 
     /**
      * function sending a disconnect command inside an empty frame to the device
+     * @throws IOException an IO error occurred while sending the data
      */
-    private  void sendDisconnectFrame()
+    private  void sendDisconnectFrame() throws IOException
     {
         //make a new empty frame
         frame = new Frame ();
@@ -645,8 +703,10 @@ public abstract class Device
      * @throws IllegalArgumentException The configuration received from
      * the device or parts of it were invalid. Therefore the
      *                      connection attempt was stopped
+     * @throws IOException the configuration could not be received, because
+     * an IO error occurred
      */
-    private void receiveConfiguration ( ) throws IncompatibleVersionException, TimeoutException, IllegalArgumentException
+    private void receiveConfiguration ( ) throws IncompatibleVersionException, TimeoutException, IllegalArgumentException, IOException
     {
         //Wait for the configuration start byte
         if(!waitForByte(Constants.CONFIGURATION_START_BYTE, RECEIVER_TIMEOUT))
@@ -701,8 +761,10 @@ public abstract class Device
      * Note: This function blocks until a null byte is received and a string is
      * returned
      * @return the string which was read from the serial Connection
+     * @throws IOException the string could not be received because an
+     * IO error occurred
      */
-    private String receiveString ( )
+    private String receiveString ( ) throws IOException
     {
 
         ArrayList<Byte> byteBuffer = new ArrayList<> ( );
@@ -739,8 +801,10 @@ public abstract class Device
      * function receiving an integer value over the serial port of this device
      * Note: This function blocks until an integer value is received and returned
      * @return the received integer value
+     * @throws IOException the integer value could not be received beacuse an
+     * IO error occurred
      */
-    private int receiveInt()
+    private int receiveInt() throws IOException
     {
         while(true)
         {
@@ -765,8 +829,10 @@ public abstract class Device
      * unsigned type variables.
      * By using a short, it's possible for this function to return an unsigned
      * byte value anyways
+     * @throws IOException the unsigned byte could not be received because
+     * an IO error occurred
      */
-    private short receiveUnsignedByte()
+    private short receiveUnsignedByte() throws IOException
     {
         while (true)
         {
@@ -796,8 +862,10 @@ public abstract class Device
      *               byte in milliseconds; has to be > 0
      * @return true, if the specified byte was received, false if the timeout
      * was exceeded or the function was interrupted
+     * @throws IOException the byte could not be received because an
+     * IO error occurred
      */
-    private boolean waitForByte(Byte b, int timeOut)
+    private boolean waitForByte(Byte b, int timeOut) throws IOException
     {
         return waitForOneOf (timeOut, b) == 0;
     }
@@ -815,8 +883,10 @@ public abstract class Device
      * @param bytes the bytes to wait for
      * @return the index of the received byte, or -1 if the timeOut was exceeded
      * or the function was interrupted
+     * @throws IOException the byte could not be received because an
+     * IO error occurred
      */
-    private  int waitForOneOf( int timeOut, byte... bytes)
+    private  int waitForOneOf( int timeOut, byte... bytes) throws IOException
     {
         //try to read the specified byte every 1ms
         for(int i = 0; i < timeOut; i++)
@@ -861,8 +931,10 @@ public abstract class Device
      * Note: This function blocks until a byte is received or a timeout of 10
      * seconds was reached
      * @return true, if the byte was received, else false
+     * @throws IOException the byte could not be received because an
+     * IO error occurred
      */
-    private boolean waitForConnectionRequest ( )
+    private boolean waitForConnectionRequest ( ) throws IOException
     {
         //try for 10s to receive a connection request
         return waitForByte (Constants.CONNECTION_REQUEST_BYTE, RECEIVER_TIMEOUT);
@@ -875,10 +947,13 @@ public abstract class Device
     //region clear
     /**
      * function setting all LEDs of the device to 0
+     * @throws TimeoutException  no frame acknowledgement received within
+     * the timeout limit
+     * @throws IOException the data could not be sent because an IO error
+     * occurred
      */
-    public void clear() throws TimeoutException
+    public void clear() throws TimeoutException, IOException
     {
-
         //create a new empty frame
         frame = new Frame ( );
         //set the clear command
@@ -889,8 +964,8 @@ public abstract class Device
 
     /**
      * function setting all LEDs of the device to 0
-     * In comparison to Clear(), this function catches TimeoutExceptions by
-     * printing the StackTrace to the terminal.
+     * In comparison to Clear(), this function catches TimeoutExceptions
+     * and IOExceptions by printing the StackTrace to the terminal.
      */
     public void simpleClear()
     {
@@ -898,7 +973,7 @@ public abstract class Device
         {
             clear();
         }
-        catch (TimeoutException e)
+        catch (TimeoutException | IOException e)
         {
             e.printStackTrace ( );
         }
