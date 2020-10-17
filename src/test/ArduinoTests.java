@@ -5,6 +5,7 @@ import com.fazecast.jSerialComm.SerialPort;
 import org.apache.commons.lang3.ObjectUtils;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.util.Scanner;
 import java.util.concurrent.TimeoutException;
 
@@ -26,7 +27,7 @@ public class ArduinoTests
     @Test
     void ConnectionTest()
     {
-        SerialDevice device = new SerialDevice (SelectPort());
+        SerialDevice device = new SerialDevice (SelectPort(), baudRate);
 
         //test before connecting the device
         assertEquals (Device.CONNECTION_STATE.DISCONNECTED, device.getConnectionState ());
@@ -37,7 +38,7 @@ public class ArduinoTests
         //connect the device
         try
         {
-            device.connect (baudRate);
+            device.connect ();
         }
         catch (TimeoutException e)
         {
@@ -48,6 +49,12 @@ public class ArduinoTests
         catch (IncompatibleVersionException e)
         {
             System.out.println ( "Device Version incompatible; No testing possible");
+            e.printStackTrace ( );
+            return;
+        }
+        catch (IOException e)
+        {
+            System.out.println ( "IO error occurred; No testing possible");
             e.printStackTrace ( );
             return;
         }
@@ -85,12 +92,12 @@ public class ArduinoTests
         device.setOffset ( device.getConfiguration ().getNumOfLeds () +1);
     }
 
-    void SendIllegalBodySizeFrame(Device device) throws TimeoutException, FrameErrorException
+    void SendIllegalBodySizeFrame(Device device) throws TimeoutException, FrameErrorException, IOException
     {
         device.send (new LED[device.getConfiguration ().getNumOfLeds () + 1]);
     }
 
-    void SendLegalFrame(Device device) throws TimeoutException
+    void SendLegalFrame(Device device) throws TimeoutException, IOException
     {
         device.send ( new LED[] {});
     }
