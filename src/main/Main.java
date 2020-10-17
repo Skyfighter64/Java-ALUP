@@ -10,6 +10,7 @@ import java.util.concurrent.TimeoutException;
 import ALUP.Device;
 import ALUP.Effects;
 import ALUP.LED;
+import ALUP.SerialDevice;
 
 public class Main
 {
@@ -28,19 +29,19 @@ public class Main
         SerialPort port = SerialPort.getCommPort (serialPortName);
 
         //create a new device
-        Device myDevice = new Device(port);
+        SerialDevice myDevice = new SerialDevice (port);
 
         //try to connect to the device
-        myDevice.SimpleConnect(115200);
+        myDevice.simpleConnect(115200);
 
         //create LED data which should be sent
         LED[] leds = new LED[] { new LED(255, 0, 0), new LED(0, 255, 0), new LED(0, 0, 255)};
 
         //Send LED data
-        myDevice.SimpleSend(leds);
+        myDevice.simpleSend(leds);
 
         //disconnect the device
-        myDevice.Disconnect();
+        myDevice.disconnect();
 
 
 /*
@@ -213,7 +214,7 @@ public class Main
 
         try
         {
-            device.Send ();
+            device.send ();
         }
         catch (TimeoutException e)
         {

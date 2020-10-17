@@ -26,7 +26,7 @@ public class ArduinoTests
     @Test
     void ConnectionTest()
     {
-        Device device = new Device (SelectPort());
+        SerialDevice device = new SerialDevice (SelectPort());
 
         //test before connecting the device
         assertEquals (Device.CONNECTION_STATE.DISCONNECTED, device.getConnectionState ());
@@ -37,7 +37,7 @@ public class ArduinoTests
         //connect the device
         try
         {
-            device.Connect (baudRate);
+            device.connect (baudRate);
         }
         catch (TimeoutException e)
         {
@@ -74,7 +74,7 @@ public class ArduinoTests
         assertDoesNotThrow( () -> SendLegalFrame (device));
 
 
-        device.Disconnect ();
+        device.disconnect ();
 
         assertEquals (Device.CONNECTION_STATE.DISCONNECTED, device.getConnectionState ());
         assertNull (device.getConfiguration ());
@@ -87,12 +87,12 @@ public class ArduinoTests
 
     void SendIllegalBodySizeFrame(Device device) throws TimeoutException, FrameErrorException
     {
-        device.Send (new LED[device.getConfiguration ().getNumOfLeds () + 1]);
+        device.send (new LED[device.getConfiguration ().getNumOfLeds () + 1]);
     }
 
     void SendLegalFrame(Device device) throws TimeoutException
     {
-        device.Send ( new LED[] {});
+        device.send ( new LED[] {});
     }
 
 
