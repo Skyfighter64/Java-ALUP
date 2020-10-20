@@ -12,6 +12,7 @@ import ALUP.Device;
 import ALUP.Effects;
 import ALUP.LED;
 import ALUP.SerialDevice;
+import ALUP.WifiDevice;
 
 public class Main
 {
@@ -26,14 +27,21 @@ public class Main
 
 
         //set the serial port at which the slave device is connected to
-        String serialPortName = "COM5";
-        SerialPort port = SerialPort.getCommPort (serialPortName);
+        //String serialPortName = "COM5";
+        //set the IP and port of the slave device
+        String ip = "192.168.178.100";
+        int port = 1201;
+
+        //SerialPort port = SerialPort.getCommPort (serialPortName);
 
         //create a new device
-        SerialDevice myDevice = new SerialDevice (port, 115200);
+        //SerialDevice myDevice = new SerialDevice (port, 115200);
+        WifiDevice myDevice = new WifiDevice (ip, port);
 
         //try to connect to the device
         myDevice.simpleConnect();
+
+        System.out.println ( myDevice.getConfiguration ().toString ());
 
         //create LED data which should be sent
         LED[] leds = new LED[] { new LED(255, 0, 0), new LED(0, 255, 0), new LED(0, 0, 255)};

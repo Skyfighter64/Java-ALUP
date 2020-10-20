@@ -41,16 +41,29 @@ public class WifiDevice extends Device
         socket = new Socket ( address, port);
     }
 
+    /**
+     * function closing the TCP connection to the server
+     * Note: This function waits until all data was sent before closing the connection
+     */
     @Override
     protected void closeConnection ( )
     {
         try
         {
+            //start the hardware disconnection process by shutting down the OutputStream
+            socket.shutdownOutput ();
+
+            while(! socket.isOutputShutdown ())
+            {
+                    //wait until the output is shut down
+            }
+
+            //close the connection
             socket.close ();
         }
         catch (IOException e)
         {
-            //the socket can't be closed; It is assumed that it already is closed
+            e.printStackTrace ( );
         }
     }
 
@@ -77,7 +90,7 @@ public class WifiDevice extends Device
     @Override
     protected void writeBytes (byte[] buffer) throws IOException
     {
-        socket.getOutputStream ().write (buffer);
+       socket.getOutputStream ().write (buffer);
     }
 
     @Override
