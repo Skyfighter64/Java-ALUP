@@ -2,7 +2,6 @@ package ALUP;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.rmi.server.ExportException;
 
 /**
  * add me
@@ -39,6 +38,8 @@ public class WifiDevice extends Device
     protected void openConnection ( ) throws IOException
     {
         socket = new Socket ( address, port);
+        //enable the TCP_NODELAY flag for faster transmission
+        socket.setTcpNoDelay (true);
     }
 
     /**
@@ -80,6 +81,13 @@ public class WifiDevice extends Device
     protected void readBytes (byte[] buffer, int bytesToRead) throws IOException
     {
         socket.getInputStream ().readNBytes (buffer, 0, bytesToRead);
+       /* System.out.print ( "Read bytes: ");
+        for(byte b : buffer)
+        {
+            System.out.print(((int)b & 0xFF) + ", ");
+        }
+
+        System.out.println ( );*/
     }
 
     /**
@@ -91,6 +99,13 @@ public class WifiDevice extends Device
     protected void writeBytes (byte[] buffer) throws IOException
     {
        socket.getOutputStream ().write (buffer);
+     /*   System.out.print ( "Written bytes: ");
+        for(byte b : buffer)
+        {
+            System.out.print(((int)b & 0xFF) + ", ");
+        }
+
+        System.out.println ( );*/
     }
 
     @Override

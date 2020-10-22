@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * In order to run this test, you have to have an Arduino connected to a USB port with an implementation of the ALUP v. 0.1 installed
  * Make sure to match the baud rate and select the right serial port
  */
-public class ArduinoTests
+public class SerialTest
 {
     static final int baudRate = 115200;
 

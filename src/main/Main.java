@@ -25,145 +25,18 @@ public class Main
     public static void main(String[] args)
     {
 
-
-        //set the serial port at which the slave device is connected to
-        //String serialPortName = "COM5";
-        //set the IP and port of the slave device
-        String ip = "192.168.178.100";
-        int port = 1201;
-
-        //SerialPort port = SerialPort.getCommPort (serialPortName);
-
-        //create a new device
-        //SerialDevice myDevice = new SerialDevice (port, 115200);
-        WifiDevice myDevice = new WifiDevice (ip, port);
-
-        //try to connect to the device
-        myDevice.simpleConnect();
-
-        System.out.println ( myDevice.getConfiguration ().toString ());
-
-        //create LED data which should be sent
-        LED[] leds = new LED[] { new LED(255, 0, 0), new LED(0, 255, 0), new LED(0, 0, 255)};
-
-        //Send LED data
-        myDevice.simpleSend(leds);
-
-        //disconnect the device
-        myDevice.disconnect();
+        WifiTest ();
 
 
-/*
-
-        // write your code here
-        SerialPort port = SelectPort((ArrayUtils.contains (args , "-a") || ArrayUtils.contains (args, "--autoselect")));
-
-        if(port == null)
-        {
-            System.out.println ( "No port selected");
-            return;
-        }
-
-        Device device = new Device (port);
-        device.SimpleConnect (115200);
-
-        System.out.println ( "Connected");
-        System.out.println ( device.getConfiguration ().toString ());
-
-        LED[] leds = new LED[] {new LED ( 255, 0, 0)};
-        device.setOffset (0);
-        device.SimpleSend (leds);
 
 
-        for (int i = 0; i < device.getConfiguration ().getNumOfLeds (); i++)
-        {
-            leds = Effects.Rainbow (1,10, i, 1);
-            device.setOffset (i);
-            device.SimpleSend (leds);
-            try
-            {
-                device.Clear ();
-            }
-            catch (TimeoutException e)
-            {
-                e.printStackTrace ( );
-            }
-            //device.SimpleSend(new LED[]{});
-            System.out.println ( "Ping: " + device.getPingMS () + "ms (" +  device.getPing () +"ns)");
 
-        }
-
-
-        try
-        {
-            device.Clear ();
-            System.out.println ( "cleared");
-        }
-        catch (TimeoutException e)
-        {
-            e.printStackTrace ( );
-        }
-        //device.SimpleSend(new LED[]{});
-        System.out.println ( "Ping: " + device.getPingMS () + "ms (" +  device.getPing () +"ns)");
-        //Delay(1);
-        //Delay(1);
-        device.Disconnect ();
-
-
-*/
- /*       for(int i = 0; i < 1000; i ++)
-        {
-            //LED[] leds = new LED[] {new LED ( 255,0,0), new LED ( 0,255,0), new LED ( 0,0,255)};
-            LED[] leds = Effects.Rainbow (5,20, i, 10);
-            device.setLeds (leds);
-            device.SimpleSend ();
-
-            System.out.println ( "Ping: " + device.getPingMS () + "ms (" +  device.getPing () +"ns)");
-            try
-            {
-                Thread.sleep (100);
-            }
-            catch (InterruptedException e)
-            {
-                e.printStackTrace ( );
-            }
-        }*/
-
-        //device.Clear();
-        /*try
-        {
-            Thread.sleep (10);
-        }
-        catch (InterruptedException e)
-        {
-            e.printStackTrace ( );
-        }*/
-
-
-       // device.Disconnect ();
 
 
         /*
-        LED[] leds = new LED[device.getConfiguration ().getNumOfLeds ()];
-
-        for(int i = 0; i < leds.length; i++)
-        {
-            leds[i] = new LED ( 255,0,0);
-        }
-
-        device.setLeds (leds);
-        try
-        {
-            device.Send ();
-        }
-        catch (TimeoutException | FrameErrorException e)
-        {
-            System.out.println ( "Error while sending data");
-            e.printStackTrace ( );
-        }
-*/
-        /*
-
+        // -------------------------------------------TESTS -------------------------------------------
+        //TODO: create separate project/ package for testing slave device implementations
+        //
           Frame frame = new Frame ();
       System.out.println (frame.toString ());
 
@@ -180,8 +53,7 @@ public class Main
         SendByte (device);
         //System.out.println (  device.ReceiveUnsignedByte ());
 
-        // -------------------------------------------TESTS -------------------------------------------
-        //TODO: create separate project/ package for testing slave device implementations
+
        // PrintSerialRead (port);
 
 
@@ -196,6 +68,82 @@ public class Main
 */
       //  System.out.println ( "receiving String...");
        // System.out.println ("String received: \"" +  device.ReceiveString () + "\"");
+    }
+
+    private static void WifiTest()
+    {
+        //set the IP and port of the slave device
+        String ip = "192.168.178.100";
+        int port = 1201;
+
+        WifiDevice myDevice = new WifiDevice (ip, port);
+
+        //try to connect to the device
+        myDevice.simpleConnect();
+
+        System.out.println ( myDevice.getConfiguration ().toString ());
+
+        //create LED data which should be sent
+        LED[] leds = new LED[] { new LED(255, 0, 0), new LED(0, 255, 0), new LED(0, 0, 255)};
+
+        //Send LED data
+        myDevice.simpleSend(leds);
+        System.out.println ( "ping: " + myDevice.getPingMS ());
+
+        long averagePing = 0;
+        long maxPing = 0;
+        for(int i = 0; i < 1000; i ++)
+        {
+            //LED[] leds = new LED[] {new LED ( 255,0,0), new LED ( 0,255,0), new LED ( 0,0,255)};
+            // leds = Effects.Rainbow (2,10, i, 3);
+            myDevice.setLeds (leds);
+            myDevice.simpleSend ();
+            System.out.println ( "RTT: " + myDevice.getPingMS () + "ms");
+            averagePing += myDevice.getPingMS ();
+            maxPing = Math.max (maxPing, myDevice.getPingMS ( ));
+        }
+
+        System.out.println ( "Average ping: " + averagePing/1000 + "ms ::  max ping: " + maxPing);
+        //disconnect the device
+        myDevice.disconnect();
+    }
+
+
+
+    private void SerialTest(String[] args)
+    {
+        SerialPort port = SelectPort((ArrayUtils.contains (args , "-a") || ArrayUtils.contains (args, "--autoselect")));
+
+        if(port == null)
+        {
+            System.out.println ( "No port selected");
+            return;
+        }
+
+        Device device = new SerialDevice (port, 115200);
+        device.simpleConnect ();
+
+        System.out.println ( "Connected");
+        System.out.println ( device.getConfiguration ().toString ());
+
+        LED[] leds = new LED[] {new LED ( 255, 0, 0)};
+        device.setOffset (0);
+        device.simpleSend (leds);
+
+
+        for (int i = 0; i < 1000; i++)
+        {
+            leds = Effects.Rainbow (1,10, i, 1);
+            device.setOffset (i);
+            device.simpleSend (leds);
+
+            System.out.println ( "Ping: " + device.getPingMS () + "ms (" +  device.getPing () +"ns)");
+        }
+
+
+        device.simpleClear ();
+        System.out.println ( "Ping: " + device.getPingMS () + "ms (" +  device.getPing () +"ns)");
+        device.disconnect ();
     }
 
 
