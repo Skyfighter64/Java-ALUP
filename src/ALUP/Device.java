@@ -457,7 +457,7 @@ public abstract class Device
         /* this is done in order to make it possible to use negative offsets or
         offset values which would otherwise be out of range */
 
-        //clamp the LED array so it allways fits to the actual LED strip
+        //clamp the LED array so it always fits to the actual LED strip
         setLeds (clampLeds (getLeds (), getOffset ()));
 
         //clamp the offset value according to the amount of connected LEDs,

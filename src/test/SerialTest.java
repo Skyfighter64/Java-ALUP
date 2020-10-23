@@ -22,12 +22,13 @@ import static org.junit.jupiter.api.Assertions.*;
 public class SerialTest
 {
     static final int baudRate = 115200;
+    static final String port = "COM5";
 
 
     @Test
     void ConnectionTest()
     {
-        SerialDevice device = new SerialDevice (SelectPort(), baudRate);
+        SerialDevice device = new SerialDevice (port, baudRate);
 
         //test before connecting the device
         assertEquals (Device.CONNECTION_STATE.DISCONNECTED, device.getConnectionState ());
@@ -102,10 +103,15 @@ public class SerialTest
         device.send ( new LED[] {});
     }
 
-
+    /**
+     * a test for the ALUP implementation of Serial Slave devices
+     *
+     * This function tests if the ALUP implementation on the connected slave device is working according to the ALUP v.0.1
+     */
     @Test
-    void ImplementationTests()
+    void ImplementationTest()
     {
+
         /*
     TODO: add arduino implementation tests
 
@@ -115,9 +121,8 @@ public class SerialTest
          *  negative body size
          * invalid frame offsets
          *  commands (subcommands, protocolCommands)
-
-
      */
+
     }
 
     /**

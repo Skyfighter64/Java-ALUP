@@ -13,6 +13,7 @@ import ALUP.Effects;
 import ALUP.LED;
 import ALUP.SerialDevice;
 import ALUP.WifiDevice;
+import test.SerialTest;
 
 public class Main
 {
@@ -25,8 +26,8 @@ public class Main
     public static void main(String[] args)
     {
 
-        WifiTest ();
-
+       // WifiTest ();
+        SerialTest(args);
 
 
 
@@ -92,7 +93,7 @@ public class Main
 
         long averagePing = 0;
         long maxPing = 0;
-        for(int i = 0; i < 1000; i ++)
+        for(int i = 0; i < 100; i ++)
         {
             //LED[] leds = new LED[] {new LED ( 255,0,0), new LED ( 0,255,0), new LED ( 0,0,255)};
             // leds = Effects.Rainbow (2,10, i, 3);
@@ -103,16 +104,17 @@ public class Main
             maxPing = Math.max (maxPing, myDevice.getPingMS ( ));
         }
 
-        System.out.println ( "Average ping: " + averagePing/1000 + "ms ::  max ping: " + maxPing);
+        System.out.println ( "Average ping: " + averagePing/100 + "ms ::  max ping: " + maxPing + "\n");
         //disconnect the device
         myDevice.disconnect();
     }
 
 
 
-    private void SerialTest(String[] args)
+    private static void SerialTest(String[] args)
     {
-        SerialPort port = SelectPort((ArrayUtils.contains (args , "-a") || ArrayUtils.contains (args, "--autoselect")));
+       // SerialPort port = SelectPort((ArrayUtils.contains (args , "-a") || ArrayUtils.contains (args, "--autoselect")));
+        SerialPort port = SelectPort(false);
 
         if(port == null)
         {
@@ -133,8 +135,8 @@ public class Main
 
         for (int i = 0; i < 1000; i++)
         {
-            leds = Effects.Rainbow (1,10, i, 1);
-            device.setOffset (i);
+            leds = Effects.Rainbow (1,10, i, device.getConfiguration ().getNumOfLeds ());
+            //device.setOffset (i);
             device.simpleSend (leds);
 
             System.out.println ( "Ping: " + device.getPingMS () + "ms (" +  device.getPing () +"ns)");
@@ -147,7 +149,7 @@ public class Main
     }
 
 
-    private static void SetLed(Device device)
+    private  void SetLed(Device device)
     {
         Scanner scanner = new Scanner (System.in);
 
@@ -205,7 +207,7 @@ public class Main
             System.out.println("No Serial devices found.");
             return null;
         }
-        else if (ports.length == 1)
+        else if (ports.length == 1 && autoSelect)
         {
             System.out.println("Only one device found: Auto selecting it...");
             //auto-select the only possible port
