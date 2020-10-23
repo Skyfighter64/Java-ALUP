@@ -1,6 +1,7 @@
 package ALUP;
 
 import com.fazecast.jSerialComm.SerialPort;
+import com.fazecast.jSerialComm.SerialPortInvalidPortException;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -59,6 +60,21 @@ public class SerialDevice extends Device
     {
         super();
         this.serialPort = serialPort;
+        this.serialPort.setBaudRate (baud);
+    }
+
+    /**
+     * constructor creating a new Device using the given serialPort name and baud rate
+     * @param serialPortName the name of the serial port of the device
+     * @param baud  the baud rate used for serial communication between
+     *             the devices; has to be a valid baud rate supported by both
+     *              devices and the same as set on the slave device
+     * @throws SerialPortInvalidPortException: The given serialPortName could not be found
+     */
+    public SerialDevice(String serialPortName, int baud) throws SerialPortInvalidPortException
+    {
+        super();
+        this.serialPort = SerialPort.getCommPort (serialPortName);
         this.serialPort.setBaudRate (baud);
     }
 
