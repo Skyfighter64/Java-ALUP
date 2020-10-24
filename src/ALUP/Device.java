@@ -24,9 +24,12 @@ public abstract class Device
     // established successfully
     DeviceConfiguration configuration;
 
-    //the ping of the device for sending of the last frame in nanoseconds or
-    // 0 if no frame was sent yet
-    long ping;
+    /**
+     *
+     * the rtt (round trip time) of the device for sending of the last frame in nanoseconds
+     * 0 if no frame was sent yet
+     */
+    long rtt;
 
     //the current frame to be sent next
     Frame frame;
@@ -466,7 +469,7 @@ public abstract class Device
 
 
 
-        //begin measuring ping here
+        //begin measuring rtt here
         long startTime = System.nanoTime ();
         //send the data to the device
         sendFrame(frame);
@@ -491,8 +494,8 @@ public abstract class Device
                 throw new FrameErrorException ("The frame could not be applied by the Slave device: Frame Error Byte received");
         }
 
-        //calculate the ping and set it to the local variable
-        ping = System.nanoTime () - startTime;
+        //calculate the rtt and set it to the local variable
+        rtt = System.nanoTime () - startTime;
     }
 
 
@@ -1035,25 +1038,25 @@ public abstract class Device
 
 
     /**
-     * getter for the ping
-     * @return the ping to the device from the last frame sent until its answer
+     * getter for the round trip time of the last Frame
+     * @return the round trip time to the device from the last frame sent until its answer
      * in nanoseconds
      */
-    public long getPing()
+    public long getRtt()
     {
-        return ping;
+        return rtt;
     }
 
 
 
     /**
-     * getter for the ping in milliseconds
-     * @return the ping to the device from the last frame sent until its answer
+     * getter for the round trip time of the last Frame
+     * @return the round trip time to the device from the last frame sent until its answer
      * in milliseconds
      */
-    public long getPingMS()
+    public long getRttMS()
     {
-        return ping / 1000000;
+        return rtt / 1000000;
     }
 
     public int getOffset()

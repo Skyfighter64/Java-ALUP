@@ -13,8 +13,6 @@ import ALUP.Effects;
 import ALUP.LED;
 import ALUP.SerialDevice;
 import ALUP.WifiDevice;
-import test.SerialTest;
-
 public class Main
 {
 
@@ -26,8 +24,8 @@ public class Main
     public static void main(String[] args)
     {
 
-       // WifiTest ();
-        SerialTest(args);
+        WifiTest ();
+       // SerialTest(args);
 
 
 
@@ -89,24 +87,25 @@ public class Main
 
         //Send LED data
         myDevice.simpleSend(leds);
-        System.out.println ( "ping: " + myDevice.getPingMS ());
+        System.out.println ( "RTT : " + myDevice.getRttMS ());
 
-        long averagePing = 0;
-        long maxPing = 0;
-        for(int i = 0; i < 100; i ++)
+        long averageRtt = 0;
+        long maxRtt = 0;
+        for(int i = 0; i < 10000; i ++)
         {
             //LED[] leds = new LED[] {new LED ( 255,0,0), new LED ( 0,255,0), new LED ( 0,0,255)};
-            // leds = Effects.Rainbow (2,10, i, 3);
+             leds = Effects.Rainbow (30,20, i, 10);
             myDevice.setLeds (leds);
             myDevice.simpleSend ();
-            System.out.println ( "RTT: " + myDevice.getPingMS () + "ms");
-            averagePing += myDevice.getPingMS ();
-            maxPing = Math.max (maxPing, myDevice.getPingMS ( ));
+            System.out.println ( "RTT: " + myDevice.getRttMS () + "ms");
+            averageRtt += myDevice.getRttMS ();
+            maxRtt = Math.max (maxRtt, myDevice.getRttMS ( ));
         }
 
-        System.out.println ( "Average ping: " + averagePing/100 + "ms ::  max ping: " + maxPing + "\n");
+        System.out.println ( "Average RTT: " + averageRtt/10000 + "ms ::  max RTT: " + maxRtt + "\n");
         //disconnect the device
         myDevice.disconnect();
+        System.out.println("Disconnected");
     }
 
 
@@ -139,12 +138,12 @@ public class Main
             //device.setOffset (i);
             device.simpleSend (leds);
 
-            System.out.println ( "Ping: " + device.getPingMS () + "ms (" +  device.getPing () +"ns)");
+            System.out.println ( "RTT: " + device.getRttMS () + "ms (" +  device.getRttMS () +"ns)");
         }
 
 
         device.simpleClear ();
-        System.out.println ( "Ping: " + device.getPingMS () + "ms (" +  device.getPing () +"ns)");
+        System.out.println ( "RTT: " + device.getRttMS () + "ms (" +  device.getRttMS () +"ns)");
         device.disconnect ();
     }
 
@@ -186,8 +185,8 @@ public class Main
             e.printStackTrace ( );
         }
 
-        //output frame ping
-        System.out.println ( "Ping: " + device.getPingMS () + "ms (" +  device.getPing () +"ns)");
+        //output frame rtt
+        System.out.println ( "RTT: " + device.getRtt () + "ms (" +  device.getRtt () +"ns)");
     }
 
 

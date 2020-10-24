@@ -81,13 +81,13 @@ public class WifiDevice extends Device
     protected void readBytes (byte[] buffer, int bytesToRead) throws IOException
     {
         socket.getInputStream ().readNBytes (buffer, 0, bytesToRead);
-       /* System.out.print ( "Read bytes: ");
+        System.out.print ( "Read bytes: ");
         for(byte b : buffer)
         {
             System.out.print(((int)b & 0xFF) + ", ");
         }
 
-        System.out.println ( );*/
+        System.out.println ( );
     }
 
     /**
@@ -123,12 +123,12 @@ public class WifiDevice extends Device
     }
 
 
-    private String getAddress ( )
+    public String getAddress ( )
     {
         return address;
     }
 
-    private int getPort ( )
+    public int getPort ( )
     {
         return port;
     }
