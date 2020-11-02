@@ -572,11 +572,11 @@ public abstract class Device
         short[] header = frame.getHeader ().serialize ();
         short[] body = LED.serializeArray (frame.getLeds ());
 
-        //TODO: remove debug message
+      /*  //TODO: remove debug message
         System.out.println ( "Sending frame: " + frame.toString ());
         System.out.println ( "Serialized header: " + ArrayUtils.toString (header));
         System.out.println ( "Serialized body: " + ArrayUtils.toString (body));
-        System.out.println ( "Body size: " + frame.getHeader ().getBodySize ());
+        System.out.println ( "Body size: " + frame.getHeader ().getBodySize ());*/
 
 
         //send the serialized bytes over the serial connection

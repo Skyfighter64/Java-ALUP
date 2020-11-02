@@ -154,7 +154,7 @@ public class SerialDevice extends Device
         return "SerialDevice{" +
                 "serialPort=" + serialPort +
                 ", configuration=" + configuration +
-                ", ping=" + ping +
+                ", RTT=" + rtt +
                 ", frame=" + frame +
                 ", connectionState=" + connectionState +
                 '}';
