@@ -167,6 +167,6 @@ Libraries used:
 
 ## License
 
-This project is licensed under [add license here]. For more information, see LICENSE (TODO: add link)
+This project is licensed under [add license here]. For more information, see [LICENSE](/LICENSE)
 
 [jSerialComm]: https://github.com/Fazecast/jSerialComm "jSerialComm GitHub Page"
