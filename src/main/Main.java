@@ -5,6 +5,7 @@ import com.fazecast.jSerialComm.*;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.IOException;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.TimeoutException;
 
@@ -24,49 +25,22 @@ public class Main
     public static void main(String[] args)
     {
 
-        WifiTest ();
-       // SerialTest(args);
+       // WifiTest ();
+        //SerialTest(args);
 
+        Device device = new SerialDevice (SelectPort (true), 115200);
+        //Device device = new WifiDevice ("192.168.178.100", 1201);
 
+        device.simpleConnect ();
 
+        AnimatedShineTest (device);
+        //RainbowTest (device);
 
+       // device.simpleSend ( Effects.Shine (24, 15, new LED ( 255, 75, 0), device.getConfiguration ().getNumOfLeds ()));
 
-
-        /*
-        // -------------------------------------------TESTS -------------------------------------------
-        //TODO: create separate project/ package for testing slave device implementations
-        //
-          Frame frame = new Frame ();
-      System.out.println (frame.toString ());
-
-      frame.setLeds (new LED[]{ new LED(255 ,255,255)});
-      frame.setSubcommand (36);
-      System.out.println ( frame.toString ());
-
-
-        port.setBaudRate (115200);
-        port.openPort ();
-        Device device = new Device ();
-        device.serialPort = port;
-
-        SendByte (device);
-        //System.out.println (  device.ReceiveUnsignedByte ());
-
-
-       // PrintSerialRead (port);
-
-
-        System.out.println ( "receiving int...");
-         System.out.println ("Int received: \"" +  device.ReceiveInt () + "\"");
-        System.out.println ( "receiving int...");
-        System.out.println ("Int received: \"" +  device.ReceiveInt () + "\"");
-        System.out.println ( "receiving int...");
-        System.out.println ("Int received: \"" +  device.ReceiveInt () + "\"");
-        System.out.println ( "receiving int...");
-        System.out.println ("Int received: \"" +  device.ReceiveInt () + "\"");
-*/
-      //  System.out.println ( "receiving String...");
-       // System.out.println ("String received: \"" +  device.ReceiveString () + "\"");
+        System.out.println ( "RTT: " + device.getRttMS () + "ms (" +  device.getRtt () +"ns)");
+        //device.simpleClear ();
+        device.disconnect ();
     }
 
     private static void WifiTest()
@@ -79,34 +53,99 @@ public class Main
 
         //try to connect to the device
         myDevice.simpleConnect();
+        myDevice.simpleClear ();
 
         System.out.println ( myDevice.getConfiguration ().toString ());
 
-        //create LED data which should be sent
-        LED[] leds = new LED[] { new LED(255, 0, 0), new LED(0, 255, 0), new LED(0, 0, 255)};
+        Random rnd = new Random ( );
 
-        //Send LED data
-        myDevice.simpleSend(leds);
-        System.out.println ( "RTT : " + myDevice.getRttMS ());
+       /* LED[] leds = Effects.Color(255 , 77 , 0, myDevice.getConfiguration ().getNumOfLeds ());
 
-        long averageRtt = 0;
+        for(int i = 0; i < leds.length; i++)
+        {
+            int brightness = rnd.nextInt ( 255);
+            leds[i].setRGB (Math.round ((float) leds[i].getRed () / 255f) * brightness, Math.round ((float) leds[i].getGreen () / 255f * brightness), Math.round ((float) leds[i].getBlue () / 255f  * brightness));
+        }*/
+
+       // LED[] leds = Effects.Shine (7, 7, new LED ( 255,255,255), myDevice.getConfiguration ().getNumOfLeds ());
+        //myDevice.simpleSend ( leds);
+          for(int i = 0; i < 10; i++)
+        {
+            Effects.Lightning (5,48,0,48,1,3,0,100,0,50, new LED ( 125,135,255), myDevice);
+            myDevice.simpleSend ( Effects.Shine (24, 15, new LED ( 0, 186, 120), myDevice.getConfiguration ().getNumOfLeds ()));
+           Delay(10000);
+        }
+
+
+     /*   long averageRtt = 0;
         long maxRtt = 0;
         for(int i = 0; i < 10000; i ++)
         {
             //LED[] leds = new LED[] {new LED ( 255,0,0), new LED ( 0,255,0), new LED ( 0,0,255)};
-             leds = Effects.Rainbow (30,20, i, 10);
+             leds = Effects.Rainbow (10,20, i, 48);
             myDevice.setLeds (leds);
+            myDevice.setClear (false);
             myDevice.simpleSend ();
             System.out.println ( "RTT: " + myDevice.getRttMS () + "ms");
             averageRtt += myDevice.getRttMS ();
             maxRtt = Math.max (maxRtt, myDevice.getRttMS ( ));
         }
 
-        System.out.println ( "Average RTT: " + averageRtt/10000 + "ms ::  max RTT: " + maxRtt + "\n");
+        System.out.println ( "Average RTT: " + averageRtt/10000 + "ms ::  max RTT: " + maxRtt + "\n");*/
         //disconnect the device
         myDevice.disconnect();
         System.out.println("Disconnected");
     }
+
+    private static void ShineTest(Device device)
+    {
+            if(!device.isConnected ())
+            {
+                System.out.println ( "Device not connected!");
+                return;
+            }
+
+            LED[] leds = Effects.Combine(
+                    Effects.Shine (3, 2, new LED ( 0,125, 0), 10),
+                    Effects.Shine (6, 2, new LED ( 0,125,125), 10));
+            device.simpleSend (leds );
+    }
+
+    private static void AnimatedShineTest(Device device)
+    {
+        if(!device.isConnected ())
+        {
+            System.out.println ( "Device not connected!");
+            return;
+        }
+        for(int j = 0; j < 10; j++)
+        {
+            for(int i = 0; i < device.getConfiguration ().getNumOfLeds () + 10; i++)
+            {
+                LED[] leds = Effects.Waves (i);
+                device.simpleSend ( leds);
+
+                Delay (100);
+            }
+        }
+
+    }
+
+    private static void RainbowTest(Device device)
+    {
+        if(!device.isConnected ())
+        {
+            System.out.println ( "Device not connected!");
+            return;
+        }
+        LED[] leds;
+        for (int i = 0; i < 1000; i++)
+        {
+            leds = Effects.Rainbow (1,10, i, device.getConfiguration ().getNumOfLeds ());
+            device.simpleSend (leds);
+        }
+    }
+
 
 
 
@@ -127,23 +166,11 @@ public class Main
         System.out.println ( "Connected");
         System.out.println ( device.getConfiguration ().toString ());
 
-        LED[] leds = new LED[] {new LED ( 255, 0, 0)};
-        device.setOffset (0);
-        device.simpleSend (leds);
 
-
-        for (int i = 0; i < 1000; i++)
-        {
-            leds = Effects.Rainbow (1,10, i, device.getConfiguration ().getNumOfLeds ());
-            //device.setOffset (i);
-            device.simpleSend (leds);
-
-            System.out.println ( "RTT: " + device.getRttMS () + "ms (" +  device.getRttMS () +"ns)");
-        }
 
 
         device.simpleClear ();
-        System.out.println ( "RTT: " + device.getRttMS () + "ms (" +  device.getRttMS () +"ns)");
+        System.out.println ( "RTT: " + device.getRttMS () + "ms (" +  device.getRtt () +"ns)");
         device.disconnect ();
     }
 
@@ -248,6 +275,7 @@ public class Main
             e.printStackTrace ( );
         }
     }
+
 
 
 
