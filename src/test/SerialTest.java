@@ -33,8 +33,8 @@ public class SerialTest
         //test before connecting the device
         assertEquals (Device.CONNECTION_STATE.DISCONNECTED, device.getConnectionState ());
         assertNull (device.getConfiguration ());
-        assertEquals (0, device.getPing ());
-        assertEquals (0, device.getPingMS ());
+        assertEquals (0, device.getRtt ());
+        assertEquals (0, device.getRttMS ());
 
         //connect the device
         try
