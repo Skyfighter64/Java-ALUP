@@ -3,6 +3,7 @@ package ALUP;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 
 /*
@@ -21,9 +22,8 @@ Copyright 2020 Skyfighter64
    limitations under the License.
  */
 
-
 /**
- * class representing a LED with a pair of 3 bytes for each color channel
+ * class representing a RGB LED with a pair of 3 bytes for each color channel
  *@version 0.1 (internal)
  */
 public class LED
@@ -196,6 +196,24 @@ public class LED
                 ", green=" + green +
                 ", blue=" + blue +
                 '}';
+    }
+
+
+    @Override
+    public boolean equals (Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass ( ) != o.getClass ( )) return false;
+        LED led = (LED) o;
+        return red == led.red &&
+                green == led.green &&
+                blue == led.blue;
+    }
+
+    @Override
+    public int hashCode ( )
+    {
+        return Objects.hash (red, green, blue);
     }
 
     /**
