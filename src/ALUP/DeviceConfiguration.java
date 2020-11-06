@@ -37,7 +37,7 @@ public class DeviceConfiguration
     private final int dataPin;
 
     //the arduino digital pin on which the clock signal gets outputted if used by the LED strip
-    //a positive number within the range of arduino digital pins or -1 if unused
+    //a positive number within the range of arduino digital pins. This value may be unused depending on the LED strip.
     private final int clockPin;
 
     //a string of extra values which can be used by any developer to configure his software

@@ -9,14 +9,8 @@ import java.util.concurrent.TimeoutException;
 
 
 /**
- *  Class representing a base for all devices.
+ *  Base class for all  devices of the Java-ALUP library.
  *
- *  When extending/implementing this class:
- *  Implement a "connect(...)" function with any arguments needed.
- *  This function  should establish the connection and then call
- *  super.connect() to establish the protocol connection.
- *
- *  For an example, see SerialDevice.java
  */
 public abstract class Device
 {
@@ -161,6 +155,14 @@ public abstract class Device
      */
     public void disconnect()
     {
+        //check if the device is already disconnected
+        if(connectionState == CONNECTION_STATE.DISCONNECTED)
+        {
+            //the device is not connected
+            //nothing has to be done
+            return;
+        }
+
         //send a disconnect command to the slave device
         try
         {
@@ -172,8 +174,6 @@ public abstract class Device
         }
         //disconnect on this side of the device
         invalidateConnection ();
-        //set the connection state to disconnected
-        connectionState = CONNECTION_STATE.DISCONNECTED;
     }
 
 

@@ -24,8 +24,60 @@ public class Main
      */
     public static void main(String[] args)
     {
+        String comPort = "COM5";
+        int baudRate = 115200;
 
-       // WifiTest ();
+        //Creating a SerialDevice:
+        Device myDevice = new SerialDevice(comPort, baudRate);
+
+        //Connecting using connect()
+        try
+        {
+            myDevice.connect();
+        }
+        catch(TimeoutException e)
+        {
+            //the device timed out while trying to connect
+            System.out.println("Oh no! Could not connect to the device because it timed out.");
+            return;
+        }
+        catch(IOException e)
+        {
+            //Could not connect to the device
+            //the device timed out while trying to connect
+            System.out.println("Could not connect to the device because there is a connection problem");
+            return;
+        }
+
+        //create an array for the leds which has the same size as the LED strip
+        LED[] leds = new LED[myDevice.getConfiguration().getNumOfLeds()];
+
+        for(int i = 0; i < 5000; i++)
+        {
+
+            //generate rainbow colors using the Effects library
+            leds = Effects.Rainbow(1,30, i, leds.length);
+
+            //send the led array to the device
+            try
+            {
+                myDevice.send ( leds);
+            }
+            catch (TimeoutException e)
+            {
+                //the device timed out while trying to send the data
+                System.out.println("Oh no! Could not send the data  because the device timed out.");
+            }
+            catch (IOException e)
+            {
+                //Could not connect to the device
+                System.out.println("Could send the data because there is a connection problem");
+            }
+        }
+
+        myDevice.disconnect ();
+
+ /*      // WifiTest ();
         //SerialTest(args);
 
         Device device = new SerialDevice (SelectPort (true), 115200);
@@ -41,7 +93,7 @@ public class Main
         System.out.println ( "RTT: " + device.getRttMS () + "ms (" +  device.getRtt () +"ns)");
         //device.simpleClear ();
         device.disconnect ();
-    }
+    */}
 
     private static void WifiTest()
     {
