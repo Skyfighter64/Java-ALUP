@@ -61,19 +61,9 @@ Waiting for Frame Error | 10000
 ### Software:
 * Java 9 or higher
 
-### Hardware:
-* USB Port, USB cable
-
-
 ## Installation
 
-### DISCLAIMER
-
-[add installation disclaimer here]
-
-
-1. Download the latest library version from [here] (TODO: add link to releases)
-2. Include the downloaded library in your project
+To add this library to your projects, see [How to Install](/Documentation/Guides/Installing.md "Installation Guide")
 
 ## Configuration
 
